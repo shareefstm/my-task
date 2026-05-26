@@ -4,8 +4,8 @@ data "aws_availability_zones" "available" {
 
 #vpc
 resource "aws_vpc" "my_vpc" {
-  cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "default"
+  cidr_block       = var.cidr_block
+  instance_tenancy = var.instance_tenancy
   enable_dns_hostnames = "true"
 
   tags = {
@@ -18,7 +18,7 @@ resource "aws_vpc" "my_vpc" {
 resource "aws_subnet" "public" {
   count= length(data.aws_availability_zones.available.names)
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = element(["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"], count.index)
+  cidr_block = element(var.public_subnet_cidr, count.index)
   map_public_ip_on_launch = "true"
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
@@ -32,7 +32,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count= length(data.aws_availability_zones.available.names)
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = element(["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"], count.index)
+  cidr_block = element(var.private_subnet_cidr, count.index)
   availability_zone= element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
@@ -74,7 +74,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.my_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.route_table_cidr
     gateway_id = aws_internet_gateway.igw.id
   }
 
@@ -86,7 +86,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.my_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.route_table_cidr
     nat_gateway_id = aws_nat_gateway.ngw.id
   }
 

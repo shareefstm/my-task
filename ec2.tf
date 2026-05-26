@@ -18,24 +18,7 @@ resource "aws_instance" "apache" {
   subnet_id = aws_subnet.private[0].id
 
   vpc_security_group_ids = [aws_security_group.apache_sg.id]
-  user_data = <<-EOF
-              #!/bin/bash
-
-              yum update -y
-              yum install httpd -y
-
-              systemctl start httpd
-              systemctl enable httpd
-
-              echo "<html>
-              <head><title>Apache Server</title></head>
-              <body style='background-color:black;'>
-              <h1 style='color:lime;text-align:center;'>
-              Apache Server Created Using Terraform
-              </h1>
-              </body>
-              </html>" > /var/www/html/index.html
-              EOF
+  user_data = file("script.sh")
 
 
   tags = {
