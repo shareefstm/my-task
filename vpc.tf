@@ -9,7 +9,7 @@ resource "aws_vpc" "my_vpc" {
   enable_dns_hostnames = "true"
 
   tags = {
-    Name = "my-vpc"
+    Name = "dev-vpc"
     Terraform = "true"
   }
 }

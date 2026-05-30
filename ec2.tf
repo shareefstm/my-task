@@ -109,3 +109,21 @@ resource "aws_lb_listener" "listener" {
     target_group_arn = aws_lb_target_group.apache_tg.arn
   }
 }
+
+#creating grafana ec2
+resource "aws_instance" "grafana" {
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "t3.micro"
+
+  key_name = "server"
+
+  subnet_id = aws_subnet.private[0].id
+
+  vpc_security_group_ids = [aws_security_group.apache_sg.id]
+  user_data = file("script.sh")
+
+
+  tags = {
+    Name = "grafana"
+  }
+}
